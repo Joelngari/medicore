@@ -1,0 +1,1005 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EduCore | School Management Suite</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#e8f4fd; --surface:#ffffff; --surface2:#f0f8ff; --surface3:#dbeafe;
+  --border:#bfdbfe; --border2:#93c5fd;
+  --accent:#0ea5e9; --accent2:#0284c7;
+  --green:#16a34a; --yellow:#d97706; --red:#dc2626;
+  --purple:#7c3aed; --pink:#db2777; --cyan:#0891b2;
+  --text:#0f172a; --muted:#64748b; --radius:8px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:14px;}
+::-webkit-scrollbar{width:3px;height:3px;}
+::-webkit-scrollbar-thumb{background:#93c5fd;border-radius:3px;}
+
+/* ════════════════════════════════
+   AUTH SCREENS
+════════════════════════════════ */
+#authWrap {
+  min-height:100vh; display:flex; align-items:center; justify-content:center;
+  position:relative; overflow:hidden;
+  background: radial-gradient(ellipse at 20% 50%, rgba(14,165,233,.12) 0%, transparent 60%),
+              radial-gradient(ellipse at 80% 20%, rgba(99,179,237,.1) 0%, transparent 55%),
+              radial-gradient(ellipse at 60% 80%, rgba(56,189,248,.08) 0%, transparent 50%),
+              var(--bg);
+}
+/* Animated orbs */
+#authWrap::before {
+  content:''; position:absolute; width:500px; height:500px; border-radius:50%;
+  background:radial-gradient(circle, rgba(14,165,233,.12) 0%, transparent 70%);
+  top:-120px; left:-100px; animation:orbFloat 12s ease-in-out infinite;
+}
+#authWrap::after {
+  content:''; position:absolute; width:400px; height:400px; border-radius:50%;
+  background:radial-gradient(circle, rgba(99,179,237,.1) 0%, transparent 70%);
+  bottom:-100px; right:-80px; animation:orbFloat 15s ease-in-out infinite reverse;
+}
+@keyframes orbFloat {
+  0%,100%{transform:translate(0,0) scale(1);}
+  33%{transform:translate(30px,-20px) scale(1.05);}
+  66%{transform:translate(-20px,15px) scale(.97);}
+}
+
+/* Grid lines background */
+.auth-grid-bg {
+  position:absolute; inset:0; z-index:0;
+  background-image: linear-gradient(rgba(14,165,233,.06) 1px, transparent 1px),
+                    linear-gradient(90deg, rgba(14,165,233,.06) 1px, transparent 1px);
+  background-size: 48px 48px;
+}
+
+.auth-card {
+  position:relative; z-index:2;
+  width:100%; max-width:460px;
+  background:rgba(255,255,255,.97);
+  border:1px solid rgba(14,165,233,.2);
+  border-radius:20px;
+  padding:40px 40px 36px;
+  backdrop-filter:blur(20px);
+  box-shadow: 0 0 0 1px rgba(14,165,233,.08),
+              0 24px 64px rgba(14,165,233,.15),
+              0 0 80px rgba(14,165,233,.1);
+  animation:cardIn .5s cubic-bezier(.16,1,.3,1);
+  margin:20px;
+}
+@keyframes cardIn{from{opacity:0;transform:translateY(20px) scale(.98);}to{opacity:1;transform:translateY(0) scale(1);}}
+
+/* Brand header inside card */
+.auth-logo-wrap {
+  display:flex; align-items:center; gap:10px; margin-bottom:28px;
+}
+.auth-logo-icon {
+  width:38px; height:38px; border-radius:10px;
+  background:linear-gradient(135deg,#0ea5e9,#0284c7);
+  display:flex; align-items:center; justify-content:center;
+  font-size:.9rem; font-weight:900; color:#fff;
+  font-family:'Syne',sans-serif; letter-spacing:-1px;
+  box-shadow:0 4px 14px rgba(14,165,233,.4);
+}
+.auth-logo-text { font-family:'Syne',sans-serif; font-size:1rem; font-weight:800; }
+.auth-logo-text span { color:var(--accent); }
+.auth-logo-sub { font-size:.6rem; color:#64748b; text-transform:uppercase; letter-spacing:1.5px; margin-top:1px; }
+
+/* Tab switcher */
+.auth-toggle{display:flex;background:rgba(14,165,233,.06);border:1px solid rgba(14,165,233,.15);border-radius:10px;padding:4px;margin-bottom:26px;gap:3px;width:100%;}
+.auth-toggle-btn{flex:1;padding:9px 16px;border:none;border-radius:7px;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:600;font-size:.83rem;background:transparent;color:var(--muted);transition:all .2s;}
+.auth-toggle-btn.active{background:linear-gradient(135deg,#0ea5e9,#0284c7);color:#fff;box-shadow:0 3px 12px rgba(240,165,0,.35);}
+
+/* legacy compat */
+.auth-tabs{display:none!important;}
+.auth-tab{}
+.auth-brand{}
+
+.auth-title{font-family:'Syne',sans-serif;font-size:1.45rem;font-weight:800;margin-bottom:5px;letter-spacing:-.3px;}
+.auth-sub{font-size:.8rem;color:#64748b;margin-bottom:22px;line-height:1.6;}
+
+.form-group{margin-bottom:14px;}
+.form-lbl{display:block;font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.9px;color:#0369a1;margin-bottom:6px;}
+.form-inp{
+  width:100%;padding:11px 14px;
+  background:#f8fbff;
+  border:1px solid rgba(14,165,233,.25);
+  border-radius:9px;color:var(--text);
+  font-family:'DM Sans',sans-serif;font-size:.88rem;
+  transition:border-color .18s,box-shadow .18s,background .18s;
+}
+.form-inp:focus{outline:none;border-color:rgba(14,165,233,.7);box-shadow:0 0 0 3px rgba(14,165,233,.12);background:#fff;}
+.form-inp::placeholder{color:var(--muted);opacity:.5;}
+.form-inp-icon{position:relative;}
+.form-inp-icon .form-inp{padding-left:14px;}
+.form-inp-icon .inp-ico{display:none;}
+
+/* Role buttons */
+.role-select{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;margin-bottom:14px;}
+.role-btn{
+  padding:10px 6px 9px;
+  border:1px solid rgba(14,165,233,.2);
+  border-radius:9px;
+  background:rgba(14,165,233,.03);
+  cursor:pointer;transition:all .18s;text-align:center;
+  font-family:'DM Sans',sans-serif;
+}
+.role-btn:hover{border-color:rgba(14,165,233,.5);background:rgba(14,165,233,.07);}
+.role-btn.role-selected{border-color:var(--accent);background:rgba(14,165,233,.1);box-shadow:0 0 0 3px rgba(14,165,233,.15);}
+.role-btn.active-teacher,.role-btn.active-counsellor,.role-btn.active-librarian,.role-btn.active-examcoord{border-color:var(--accent);background:rgba(14,165,233,.1);}
+.role-btn .role-ico{font-size:1.2rem;display:block;margin-bottom:4px;}
+.role-btn .role-nm{font-size:.7rem;font-weight:700;color:var(--text);}
+.role-btn .role-desc{font-size:.58rem;color:var(--muted);margin-top:2px;}
+
+.auth-btn{
+  width:100%;padding:13px;border:none;border-radius:10px;
+  font-family:'DM Sans',sans-serif;font-weight:700;font-size:.9rem;
+  cursor:pointer;transition:all .2s;margin-top:8px;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  letter-spacing:.2px;
+}
+.auth-btn-primary{
+  background:linear-gradient(135deg,#0ea5e9,#0284c7);
+  color:#fff;
+  box-shadow:0 4px 18px rgba(240,165,0,.3);
+}
+.auth-btn-primary:hover{transform:translateY(-1px);box-shadow:0 6px 24px rgba(14,165,233,.5);}
+.auth-btn-primary:active{transform:translateY(0);}
+.auth-btn-purple{background:linear-gradient(135deg,#8b5cf6,#7c3aed);color:#fff;}
+.auth-btn-purple:hover{box-shadow:0 4px 16px rgba(139,92,246,.35);}
+
+.auth-divider{display:none;}
+.auth-link{color:#0284c7;cursor:pointer;font-weight:600;transition:.15s;}
+.auth-link:hover{color:#0369a1;}
+
+.auth-err{background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);border-radius:8px;color:#f87171;padding:9px 13px;font-size:.8rem;margin-bottom:14px;display:none;}
+.auth-success{background:rgba(14,165,233,.08);border:1px solid rgba(14,165,233,.25);border-radius:8px;color:#0284c7;padding:9px 13px;font-size:.8rem;margin-bottom:14px;display:none;}
+.admin-note{background:rgba(14,165,233,.07);border:1px solid rgba(14,165,233,.2);border-radius:7px;padding:9px 12px;font-size:.74rem;color:#0284c7;margin-bottom:12px;}
+.strength-bar{height:3px;background:rgba(255,255,255,.06);margin-top:6px;border-radius:2px;overflow:hidden;}
+.strength-fill{height:100%;border-radius:2px;transition:width .3s,background .3s;}
+
+/* Divider line */
+.auth-foot-link{text-align:center;font-size:.78rem;color:#64748b;margin-top:18px;}
+.auth-foot-link .auth-link{font-size:.78rem;}
+
+/* Side panel gone — single centered card */
+.auth-side{display:none;}
+.auth-main{display:contents;}
+
+/* ════════════════════════════════
+   APP SHELL (hidden until login)
+════════════════════════════════ */
+#appWrap { display:none; height:100vh; overflow:hidden; flex-direction:column; }
+#appWrap.visible { display:flex; }
+
+/* TOP NAV BAR */
+.topbar {
+  height:50px; background:linear-gradient(135deg,#0ea5e9,#0284c7); border-bottom:1px solid rgba(14,165,233,.3);
+  display:flex; align-items:center; padding:0 22px; gap:12px; flex-shrink:0;
+  justify-content:space-between;
+  box-shadow:0 2px 12px rgba(14,165,233,.25);
+}
+.topbar-brand { font-family:'Syne',sans-serif; font-size:.9rem; font-weight:800; letter-spacing:.5px; color:#fff; }
+.topbar-brand span { color:#bae6fd; }
+.topbar-right { display:flex; align-items:center; gap:14px; }
+.user-chip {
+  display:flex; align-items:center; gap:8px;
+  background:rgba(255,255,255,.2); border:1px solid rgba(255,255,255,.3);
+  border-radius:20px; padding:5px 12px 5px 5px;
+}
+.user-avatar {
+  width:28px; height:28px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  font-family:'Syne',sans-serif; font-weight:800; font-size:.75rem; color:#fff;
+}
+.user-name  { font-size:.78rem; font-weight:600; color:#fff; }
+.user-role  { font-size:.62rem; color:rgba(255,255,255,.75); }
+.logout-btn {
+  padding:5px 12px; background:rgba(255,255,255,.15); border:1px solid rgba(255,255,255,.3);
+  border-radius:6px; color:#fff; font-size:.75rem; font-weight:600;
+  cursor:pointer; transition:.18s; font-family:'DM Sans',sans-serif;
+}
+.logout-btn:hover { background:rgba(255,255,255,.25); border-color:rgba(255,255,255,.5); }
+#clock-top { font-size:.72rem; color:rgba(255,255,255,.8); font-variant-numeric:tabular-nums; }
+
+/* MAIN LAYOUT */
+.app-body { display:flex; flex-grow:1; overflow:hidden; }
+
+/* SIDEBAR */
+aside{width:200px;min-width:200px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto;}
+.nav-section{padding:14px 14px 4px;font-size:.58rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-top:2px;}
+.nav-item{display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:6px;cursor:pointer;font-weight:500;font-size:.83rem;color:var(--muted);transition:all .15s;margin:1px 8px;position:relative;}
+.nav-item:hover{background:var(--surface2);color:var(--text);}
+.nav-item.active{background:rgba(240,165,0,.12);color:var(--accent);}
+.nav-item.active::before{content:'';position:absolute;left:0;top:25%;height:50%;width:2.5px;background:var(--accent);border-radius:0 2px 2px 0;}
+.nav-item.locked{opacity:.35;cursor:not-allowed;}
+.nav-item.locked:hover{background:transparent;color:var(--muted);}
+.nav-icon{width:14px;text-align:center;font-size:.55rem;color:var(--border2);}
+.nav-badge{margin-left:auto;border-radius:10px;padding:1px 6px;font-size:.58rem;font-weight:700;}
+.nb-r{background:var(--red);color:#fff;}.nb-y{background:var(--yellow);color:#111;}
+.sidebar-foot{padding:10px 14px;font-size:.62rem;color:var(--muted);border-top:1px solid var(--border);line-height:1.8;margin-top:auto;}
+
+/* MAIN CONTENT */
+main{flex-grow:1;display:flex;flex-direction:column;overflow:hidden;}
+.view-wrap{flex-grow:1;overflow-y:auto;padding:22px 26px;}
+.view{display:none;animation:fadeUp .2s ease;}
+.view.active{display:block;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(7px);}to{opacity:1;transform:translateY(0);}}
+
+/* ═══ REUSABLE COMPONENTS ═══ */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px 22px;margin-bottom:14px;}
+.card-title{font-family:'Syne',sans-serif;font-size:.72rem;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--muted);padding-bottom:10px;margin-bottom:16px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;}
+.card-title span{color:var(--accent);font-size:.62rem;}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
+.g5{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;}
+.lbl{display:block;font-size:.62rem;font-weight:600;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);margin-bottom:5px;margin-top:13px;}
+input[type=text],input[type=date],input[type=number],input[type=time],input[type=email],input[type=password],select,textarea{width:100%;padding:9px 11px;background:var(--surface2);border:1px solid var(--border);border-radius:7px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:.85rem;transition:border-color .18s,box-shadow .18s;resize:vertical;}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(240,165,0,.1);}
+input::placeholder,textarea::placeholder{color:var(--muted);opacity:.55;}
+select option{background:var(--surface2);}
+.btn{padding:8px 16px;border:none;border-radius:7px;font-family:'DM Sans',sans-serif;font-weight:600;font-size:.82rem;cursor:pointer;transition:all .18s;display:inline-flex;align-items:center;gap:6px;}
+.btn-p{background:var(--accent);color:#fff;}.btn-p:hover{background:var(--accent2);}
+.btn-s{background:var(--green);color:#fff;}.btn-s:hover{background:#d4900a;}
+.btn-d{background:var(--red);color:#fff;}.btn-d:hover{background:#dc2626;}
+.btn-g{background:transparent;border:1px solid var(--border);color:var(--muted);}.btn-g:hover{border-color:var(--accent);color:var(--accent);}
+.btn-y{background:var(--yellow);color:#111;}
+.btn-full{width:100%;justify-content:center;padding:11px;margin-top:14px;}
+.stat{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px;}
+.stat-val{font-family:'Syne',sans-serif;font-size:1.45rem;font-weight:800;}
+.stat-lbl{font-size:.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-top:2px;}
+.ca{color:#0284c7;}.cg{color:var(--green);}.cy{color:var(--yellow);}.cr{color:var(--red);}.cp{color:var(--purple);}.cc{color:var(--cyan);}
+.tbl{width:100%;border-collapse:collapse;}
+.tbl th{text-align:left;padding:10px 14px;font-size:.62rem;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border);}
+.tbl td{padding:11px 14px;border-bottom:1px solid rgba(26,40,64,.6);font-size:.84rem;vertical-align:middle;}
+.tbl tr:hover td{background:var(--surface2);}
+.mono{font-family:'Courier New',monospace;font-size:.72rem;color:var(--accent);}
+.bdg{padding:2px 7px;border-radius:4px;font-size:.62rem;font-weight:700;letter-spacing:.2px;display:inline-block;}
+.bb{background:rgba(240,165,0,.1);color:#60a5fa;border:1px solid rgba(240,165,0,.2);}
+.bg{background:rgba(240,165,0,.1);color:#34d399;border:1px solid rgba(240,165,0,.2);}
+.by{background:rgba(245,158,11,.1);color:#fbbf24;border:1px solid rgba(245,158,11,.2);}
+.br{background:rgba(239,68,68,.1);color:#f87171;border:1px solid rgba(239,68,68,.2);}
+.bp{background:rgba(139,92,246,.1);color:#a78bfa;border:1px solid rgba(139,92,246,.2);}
+.bc{background:rgba(6,182,212,.1);color:#22d3ee;border:1px solid rgba(6,182,212,.2);}
+.bpk{background:rgba(236,72,153,.1);color:#f472b6;border:1px solid rgba(236,72,153,.2);}
+.panel{background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:14px 16px;margin-top:14px;}
+.panel-title{font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);margin-bottom:9px;display:flex;align-items:center;gap:6px;}
+.mode-tog{display:flex;background:var(--surface2);padding:3px;border-radius:8px;margin-bottom:16px;width:fit-content;border:1px solid var(--border);}
+.mode-btn{padding:7px 18px;border-radius:6px;border:none;font-weight:600;font-size:.8rem;cursor:pointer;transition:all .18s;color:var(--muted);background:transparent;font-family:'DM Sans',sans-serif;}
+.mode-btn.active{background:var(--accent);color:#fff;}
+.recall-box{background:rgba(245,158,11,.05);border:1px solid rgba(245,158,11,.18);padding:13px;border-radius:8px;margin-bottom:16px;display:none;}
+.recall-res{background:var(--surface2);border:1px solid rgba(245,158,11,.15);padding:8px 12px;margin-top:5px;cursor:pointer;border-radius:6px;font-size:.82rem;transition:.18s;}
+.recall-res:hover{border-color:var(--yellow);color:var(--yellow);}
+.disp-g{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px;}
+.disp-card{border:1.5px solid var(--border);border-radius:8px;padding:10px;cursor:pointer;transition:all .18s;text-align:center;background:var(--surface);}
+.disp-card:hover{border-color:var(--accent);}
+.disp-icon{font-size:1.2rem;display:block;margin-bottom:3px;}
+.disp-lbl{font-size:.68rem;font-weight:700;color:var(--muted);}
+.disp-sub{font-size:.58rem;color:var(--muted);margin-top:1px;opacity:.65;}
+.disp-card.sel-return{border-color:#f0a500;background:rgba(240,165,0,.07);}.disp-card.sel-return .disp-lbl{color:#34d399;}
+.disp-card.sel-referral{border-color:#f59e0b;background:rgba(245,158,11,.07);}.disp-card.sel-referral .disp-lbl{color:#fbbf24;}
+.disp-card.sel-transfer{border-color:#ef4444;background:rgba(239,68,68,.07);}.disp-card.sel-transfer .disp-lbl{color:#f87171;}
+.disp-det{display:none;}.disp-det.open{display:block;animation:fadeUp .18s ease;}
+.seat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:8px;}
+.seat-tile{border:1.5px solid var(--border);border-radius:8px;padding:10px 8px;text-align:center;cursor:pointer;transition:all .18s;background:var(--surface);}
+.seat-tile:hover{transform:translateY(-2px);box-shadow:0 5px 18px rgba(0,0,0,.35);}
+.seat-icon{font-size:1.3rem;display:block;margin-bottom:4px;}
+.seat-num{font-family:'Syne',sans-serif;font-size:.72rem;font-weight:800;}
+.seat-slbl{font-size:.58rem;font-weight:600;margin-top:2px;text-transform:uppercase;letter-spacing:.4px;}
+.seat-pname{font-size:.55rem;color:var(--muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:88px;margin:auto;}
+.bf{border-color:rgba(240,165,0,.35);background:rgba(240,165,0,.05);}.bf .seat-slbl{color:#34d399;}
+.bo{border-color:rgba(239,68,68,.3);background:rgba(239,68,68,.05);}.bo .seat-slbl{color:#f87171;}
+.br2{border-color:rgba(245,158,11,.3);background:rgba(245,158,11,.05);}.br2 .seat-slbl{color:#fbbf24;}
+.bm{border-color:rgba(100,116,139,.3);background:rgba(100,116,139,.05);}.bm .seat-slbl{color:#94a3b8;}
+.room-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;}
+.room-tab{padding:6px 14px;border-radius:6px;border:1px solid #bfdbfe;font-size:.75rem;font-weight:600;cursor:pointer;transition:.18s;color:#64748b;background:#f0f8ff;}
+.room-tab:hover{border-color:#0ea5e9;color:#0284c7;}
+.room-tab.active{background:linear-gradient(135deg,#0ea5e9,#0284c7);color:#fff;border-color:#0284c7;}
+.legend{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:12px;}
+.leg-item{display:flex;align-items:center;gap:4px;font-size:.68rem;color:var(--muted);}
+.leg-dot{width:9px;height:9px;border-radius:50%;}
+.intake-levels{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:14px;}
+.intake-btn{padding:10px 6px;border-radius:8px;border:2px solid transparent;font-weight:700;font-size:.72rem;cursor:pointer;transition:all .18s;text-align:center;font-family:'DM Sans',sans-serif;}
+.t1{background:rgba(239,68,68,.12);color:#f87171;border-color:rgba(239,68,68,.3);}.t1.sel{background:var(--red);color:#fff;border-color:var(--red);}
+.t2{background:rgba(249,115,22,.12);color:#fb923c;border-color:rgba(249,115,22,.3);}.t2.sel{background:#f97316;color:#fff;border-color:#f97316;}
+.t3{background:rgba(245,158,11,.12);color:#fbbf24;border-color:rgba(245,158,11,.3);}.t3.sel{background:var(--yellow);color:#111;border-color:var(--yellow);}
+.t4{background:rgba(14,165,233,.1);color:#0284c7;border-color:rgba(14,165,233,.25);}.t4.sel{background:#0ea5e9;color:#fff;border-color:#0ea5e9;}
+.t5{background:rgba(100,116,139,.1);color:#94a3b8;border-color:rgba(100,116,139,.25);}.t5.sel{background:#475569;color:#fff;border-color:#475569;}
+.hr{border:none;border-top:1px solid var(--border);margin:14px 0;}
+.chart-hdr{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;}
+.pt-name{font-family:'Syne',sans-serif;font-size:1.25rem;font-weight:800;}
+.pid-badge{background:rgba(14,165,233,.1);color:#0284c7;border:1px solid rgba(14,165,233,.2);padding:3px 9px;border-radius:4px;font-size:.68rem;font-weight:700;margin-top:4px;display:inline-block;}
+.tbl-btn{padding:4px 10px;border:1px solid var(--border);border-radius:5px;background:transparent;color:var(--accent);font-size:.68rem;font-weight:600;cursor:pointer;transition:.18s;font-family:'DM Sans',sans-serif;}
+.tbl-btn:hover{background:rgba(240,165,0,.1);border-color:var(--accent);}
+.tbl-btn-r{color:var(--red);}.tbl-btn-r:hover{background:rgba(239,68,68,.1);border-color:var(--red);}
+.tbl-btn-g{color:var(--green);}.tbl-btn-g:hover{background:rgba(240,165,0,.1);border-color:var(--green);}
+.staff-card{background:#f0f8ff;border:1px solid #bfdbfe;border-radius:9px;padding:14px;display:flex;align-items:center;gap:12px;}
+.staff-avatar{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1rem;font-weight:800;font-family:'Syne',sans-serif;color:#fff;flex-shrink:0;}
+.stock-bar{height:5px;border-radius:3px;background:var(--border);overflow:hidden;margin-top:4px;}
+.stock-fill{height:100%;border-radius:3px;}
+.bill-total-box{background:rgba(14,165,233,.07);border:1px solid rgba(14,165,233,.2);border-radius:8px;padding:12px 16px;margin-top:12px;display:flex;justify-content:space-between;align-items:center;}
+.appt-slot{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:7px;background:#f0f8ff;border:1px solid #bfdbfe;margin-bottom:6px;}
+.appt-time{font-family:'Syne',sans-serif;font-size:.78rem;font-weight:700;color:#0284c7;width:55px;flex-shrink:0;}
+.modal-ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:1000;align-items:center;justify-content:center;}
+.modal-ov.open{display:flex;}
+.modal{background:#ffffff;border:1px solid #bfdbfe;border-radius:12px;padding:24px 26px;width:460px;max-width:95vw;max-height:90vh;overflow-y:auto;animation:fadeUp .2s ease;box-shadow:0 20px 50px rgba(14,165,233,.2);}
+.modal-title{font-family:'Syne',sans-serif;font-size:.95rem;font-weight:800;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;}
+.modal-close{background:none;border:none;color:var(--muted);font-size:1.1rem;cursor:pointer;transition:.18s;padding:0 4px;}
+.modal-close:hover{color:var(--red);}
+.modal-actions{display:flex;gap:8px;margin-top:16px;justify-content:flex-end;}
+
+/* ADMIN PANEL SPECIFIC */
+.admin-user-row{display:flex;align-items:center;gap:12px;padding:11px 14px;background:#f0f8ff;border:1px solid #bfdbfe;border-radius:8px;margin-bottom:6px;}
+.admin-user-av{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:.85rem;color:#fff;flex-shrink:0;}
+.pending-badge{background:rgba(245,158,11,.15);border:1px solid rgba(245,158,11,.25);color:#fbbf24;border-radius:6px;padding:2px 8px;font-size:.62rem;font-weight:700;}
+.approved-badge{background:rgba(240,165,0,.12);border:1px solid rgba(240,165,0,.25);color:#34d399;border-radius:6px;padding:2px 8px;font-size:.62rem;font-weight:700;}
+.rejected-badge{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.2);color:#f87171;border-radius:6px;padding:2px 8px;font-size:.62rem;font-weight:700;}
+.notif-dot{width:7px;height:7px;border-radius:50%;background:var(--red);display:inline-block;margin-left:4px;animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.4;}}
+
+/* ── ADMIN PANEL ── */
+.adm-tab{padding:9px 18px;border:none;background:transparent;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:.82rem;font-weight:600;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .18s;}
+.adm-tab:hover{color:var(--text);}
+.adm-tab.active{color:#0284c7;border-bottom-color:#0ea5e9;}
+.apanel{display:none;animation:fadeUp .2s ease;}
+.apanel.active{display:block;}
+.role-breakdown-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);}
+.role-breakdown-row:last-child{border-bottom:none;}
+.role-bar-wrap{flex:1;height:6px;background:var(--border);border-radius:3px;overflow:hidden;}
+.role-bar-fill{height:100%;border-radius:3px;transition:width .4s ease;}
+</style>
+</head>
+<body>
+
+<!-- ════════════════════════════════════════════════
+     AUTH SCREENS
+════════════════════════════════════════════════ -->
+<div id="authWrap">
+  <div class="auth-grid-bg"></div>
+
+  <div class="auth-card" id="loginPanel">
+
+    <!-- Brand header -->
+    <div class="auth-logo-wrap">
+      <div class="auth-logo-icon">M</div>
+      <div>
+        <div class="auth-logo-text">EDU<span>CORE</span></div>
+        <div class="auth-logo-sub">School Management Suite</div>
+      </div>
+    </div>
+
+    <!-- Toggle tabs -->
+    <div class="auth-toggle">
+      <button class="auth-toggle-btn active" id="toggleSignIn" onclick="Auth.showLogin()">Sign In</button>
+      <button class="auth-toggle-btn" id="toggleRegister" onclick="Auth.showRegister()">Create Account</button>
+    </div>
+
+    <!-- legacy hidden tabs for JS compat -->
+    <div class="auth-tabs">
+      <button class="auth-tab active" onclick="Auth.showLogin()">Sign In</button>
+      <button class="auth-tab" onclick="Auth.showRegister()">Create Account</button>
+    </div>
+
+    <!-- ── SIGN IN FORM ── -->
+    <div id="loginForm">
+      <div class="auth-title">Welcome back</div>
+      <div class="auth-sub">Sign in to continue to the school system</div>
+      <div id="loginErr" class="auth-err"></div>
+
+      <div class="form-group">
+        <label class="form-lbl">Username</label>
+        <input class="form-inp" type="text" id="loginUsername" placeholder="Enter your username" autocomplete="off">
+      </div>
+      <div class="form-group" style="margin-bottom:4px;">
+        <label class="form-lbl">Password</label>
+        <input class="form-inp" type="password" id="loginPass" placeholder="Enter your password" onkeydown="if(event.key==='Enter')(async()=>{await Auth.login();})()">
+      </div>
+      <div style="text-align:right;margin-bottom:4px;">
+        <span class="auth-link" style="font-size:.75rem;" onclick="Auth.showForgot()">Forgot password?</span>
+      </div>
+
+      <button class="auth-btn auth-btn-primary" onclick="(async()=>{const er=document.getElementById('loginErr');if(er)er.style.display='none';try{await Auth.login();}catch(e){if(er){er.innerText=e.message||'Login failed';er.style.display='block';}}})()" style="margin-top:12px;">Sign In →</button>
+
+      <div class="auth-foot-link">
+        No account? <span class="auth-link" onclick="Auth.showRegister()">Create one</span>
+      </div>
+    </div>
+
+    <!-- ── REGISTER FORM ── -->
+    <div id="registerForm" style="display:none;">
+      <div class="auth-title">Create account</div>
+      <div class="auth-sub">Staff registration — access granted immediately</div>
+      <div id="regErr" class="auth-err"></div>
+      <div id="regSuccess" class="auth-success"></div>
+
+      <div class="form-group">
+        <label class="form-lbl">Your Role</label>
+        <div class="role-select">
+          <div class="role-btn" id="roleTeacher" onclick="Auth.selectRole('teacher')">
+            <span class="role-ico">🎓</span>
+            <div class="role-nm">Teacher</div>
+            <div class="role-desc">Teaching access</div>
+          </div>
+          <div class="role-btn" id="roleCounsellor" onclick="Auth.selectRole('counsellor')">
+            <span class="role-ico">👩‍⚕️</span>
+            <div class="role-nm">Counsellor</div>
+            <div class="role-desc">Support access</div>
+          </div>
+          <div class="role-btn" id="rolePharm" onclick="Auth.selectRole('librarian')">
+            <span class="role-ico">📚</span>
+            <div class="role-nm">Librarian</div>
+            <div class="role-desc">Library</div>
+          </div>
+          <div class="role-btn" id="roleLab" onclick="Auth.selectRole('exam')">
+            <span class="role-ico">📝</span>
+            <div class="role-nm">Exam Coord</div>
+            <div class="role-desc">Examinations</div>
+          </div>
+          <div class="role-btn" id="roleAdmin" onclick="Auth.selectRole('admin')">
+            <span class="role-ico">⚙️</span>
+            <div class="role-nm">Admin</div>
+            <div class="role-desc">Full access</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-lbl">Full Name</label>
+        <input class="form-inp" type="text" id="regName" placeholder="e.g. Jane Doe">
+      </div>
+      <div class="form-group">
+        <label class="form-lbl">Username</label>
+        <input class="form-inp" type="text" id="regUsername" placeholder="e.g. janedoe" autocomplete="off">
+      </div>
+      <div class="form-group">
+        <label class="form-lbl">Password</label>
+        <input class="form-inp" type="password" id="regPass" placeholder="Choose a password" onkeyup="Auth.checkStrength()">
+        <div class="strength-bar"><div class="strength-fill" id="strengthFill" style="width:0;"></div></div>
+        <div style="font-size:.6rem;color:var(--muted);margin-top:4px;" id="strengthText"></div>
+      </div>
+      <div class="form-group">
+        <label class="form-lbl">Security Question</label>
+        <select class="form-inp" id="regSecQ">
+          <option value="">— Choose a question —</option>
+          <option>What is the name of your first pet?</option>
+          <option>What is your mother's maiden name?</option>
+          <option>What was the name of your primary school?</option>
+          <option>What is the name of the town you were born in?</option>
+          <option>What was your childhood nickname?</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-lbl">Security Answer</label>
+        <input class="form-inp" type="text" id="regSecA" placeholder="Your answer (case-insensitive)" autocomplete="off">
+      </div>
+
+      <button class="auth-btn auth-btn-primary" onclick="(async()=>{const er=document.getElementById('regErr');if(er)er.style.display='none';try{await Auth.register();}catch(e){if(er){er.innerText=e.message||'Error';er.style.display='block';}}})()" >Create Account →</button>
+      <div class="auth-foot-link">
+        Already registered? <span class="auth-link" onclick="Auth.showLogin()">Sign in</span>
+      </div>
+    </div>
+
+    <!-- ── REGISTRATION SUCCESS SCREEN ── -->
+    <div id="regSuccessScreen" style="display:none;text-align:center;padding:10px 0 6px;">
+      <div style="width:70px;height:70px;border-radius:50%;background:rgba(240,165,0,.12);border:2px solid rgba(240,165,0,.35);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-size:2rem;animation:cardIn .4s cubic-bezier(.16,1,.3,1);">✅</div>
+      <div style="font-family:'Syne',sans-serif;font-size:1.3rem;font-weight:800;margin-bottom:8px;">Account Created!</div>
+      <div style="font-size:.82rem;color:var(--muted);line-height:1.7;margin-bottom:6px;" id="regSuccessName"></div>
+      <div style="font-size:.78rem;color:var(--muted);margin-bottom:28px;">Your account is active and ready to use.</div>
+      <button class="auth-btn auth-btn-primary" onclick="Auth.showLogin()" style="max-width:260px;margin:0 auto;">Go to Sign In →</button>
+    </div>
+
+    <!-- ── FORGOT PASSWORD PANEL ── -->
+    <div id="forgotForm" style="display:none;">
+      <div class="auth-title">Reset Password</div>
+      <div class="auth-sub">Answer your security question to set a new password</div>
+      <div id="forgotErr" class="auth-err"></div>
+      <div id="forgotSuccess" class="auth-success"></div>
+
+      <!-- Step 1: enter username -->
+      <div id="forgotStep1">
+        <div class="form-group">
+          <label class="form-lbl">Username</label>
+          <input class="form-inp" type="text" id="forgotUsername" placeholder="Enter your username" autocomplete="off" onkeydown="if(event.key==='Enter')Auth.forgotLookup()">
+        </div>
+        <button class="auth-btn auth-btn-primary" onclick="(async()=>{try{await Auth.forgotLookup();}catch(e){console.error(e);}})()" >Continue →</button>
+      </div>
+
+      <!-- Step 2: answer question + set new password -->
+      <div id="forgotStep2" style="display:none;">
+        <div class="form-group">
+          <label class="form-lbl">Security Question</label>
+          <div id="forgotQuestion" style="font-size:.85rem;color:var(--text);padding:10px 14px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:9px;"></div>
+        </div>
+        <div class="form-group">
+          <label class="form-lbl">Your Answer</label>
+          <input class="form-inp" type="text" id="forgotAnswer" placeholder="Enter your answer" autocomplete="off">
+        </div>
+        <div class="form-group">
+          <label class="form-lbl">New Password</label>
+          <input class="form-inp" type="password" id="forgotNewPass" placeholder="Choose a new password">
+        </div>
+        <button class="auth-btn auth-btn-primary" onclick="(async()=>{try{await Auth.forgotReset();}catch(e){console.error(e);}})()" >Reset Password →</button>
+      </div>
+
+      <div class="auth-foot-link" style="margin-top:14px;">
+        Remembered it? <span class="auth-link" onclick="Auth.showLogin()">Sign in</span>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════
+     APP SHELL
+════════════════════════════════════════════════ -->
+<div id="appWrap">
+  <!-- TOP BAR -->
+  <div class="topbar">
+    <div style="display:flex;align-items:center;gap:16px;">
+      <a href="../landing.html" style="text-decoration:none;" title="Back to homepage"><div class="topbar-brand">EDU<span>CORE</span></div></a>
+      <span style="font-size:.7rem;color:rgba(255,255,255,.6);background:rgba(255,255,255,.15);padding:3px 9px;border-radius:100px;margin-left:4px;" id="cloudBadge" title="Data saved to Supabase cloud">☁ Cloud</span><span id="hdrAlert" style="display:none;font-size:.72rem;color:var(--yellow);font-weight:600;cursor:pointer;" onclick="goTo('intake')">Urgent intake waiting</span>
+    </div>
+    <div class="topbar-right">
+      <div id="clock-top"></div>
+      <div class="user-chip">
+        <div class="user-avatar" id="userAvatar"></div>
+        <div>
+          <div class="user-name" id="userName"></div>
+          <div class="user-role" id="userRoleLabel"></div>
+        </div>
+      </div>
+      <button class="logout-btn" onclick="Auth.logout()">Logout</button>
+    </div>
+  </div>
+
+  <div class="app-body">
+    <!-- SIDEBAR -->
+    <aside>
+      <!-- Student Flow -->
+      <div class="nav-section" id="ns-flow">Student Flow</div>
+      <div class="nav-item" id="nav-dash"     onclick="goTo('dash')">     <span class="nav-icon">◆</span> Dashboard</div>
+      <div class="nav-item" id="nav-intake"   onclick="goTo('intake')">   <span class="nav-icon">◆</span> Intake / Referral <span class="nav-badge nb-r" id="nb-intake">0</span></div>
+      <div class="nav-item" id="nav-reg"      onclick="goTo('reg')">      <span class="nav-icon">◆</span> Registration</div>
+      <div class="nav-item" id="nav-appt"     onclick="goTo('appt')">     <span class="nav-icon">◆</span> Sessions <span class="nav-badge nb-y" id="nb-appt">0</span></div>
+      <!-- Academic -->
+      <div class="nav-section" id="ns-clinical">Academics</div>
+      <div class="nav-item" id="nav-db"       onclick="goTo('db')">       <span class="nav-icon">◆</span> Student Records</div>
+      <div class="nav-item" id="nav-chart"    onclick="goTo('chart')">    <span class="nav-icon">◆</span> Academic Record</div>
+      <div class="nav-item" id="nav-metrics"   onclick="goTo('metrics')">   <span class="nav-icon">◆</span> Academic Metrics</div>
+      <div class="nav-item" id="nav-exam"      onclick="goTo('exam')">      <span class="nav-icon">◆</span> Examinations</div>
+      <!-- Resources -->
+      <div class="nav-section" id="ns-ops">Resources</div>
+      <div class="nav-item" id="nav-rooms"     onclick="goTo('rooms')">     <span class="nav-icon">◆</span> Rooms &amp; Seats</div>
+      <div class="nav-item" id="nav-library" onclick="goTo('library')"> <span class="nav-icon">◆</span> LibMgrcy</div>
+      <div class="nav-item" id="nav-billing"  onclick="goTo('billing')">  <span class="nav-icon">◆</span> Billing</div>
+      <!-- Admin only -->
+      <div class="nav-section" id="ns-admin" style="display:none;">Administration</div>
+      <div class="nav-item"  id="nav-admin"   onclick="goTo('admin')">    <span class="nav-icon">◆</span> Admin Panel <span class="nav-badge nb-r" id="nb-pending" style="display:none;"></span></div>
+      <div class="nav-item"  id="nav-staff"   onclick="goTo('staff')">    <span class="nav-icon">◆</span> Staff</div>
+      <div class="nav-item"  id="nav-ledger"  onclick="goTo('ledger')">   <span class="nav-icon">◆</span> Audit Ledger</div>
+      <div class="sidebar-foot" id="sidebarStats">Loading…</div>
+    </aside>
+
+    <!-- MAIN -->
+    <main>
+      <div class="view-wrap">
+
+        <!-- DASHBOARD -->
+        <div id="dash-view" class="view">
+          <div class="g4" id="dashStats" style="margin-bottom:16px;"></div>
+          <div class="g2">
+            <div>
+              <div class="card"><div class="card-title">🚨 Intake Queue <span id="dash-intake-count"></span></div><div id="dash-intake-list"></div></div>
+              <div class="card"><div class="card-title">📅 Today's Sessions <span id="dash-appt-count"></span></div><div id="dash-appt-list"></div></div>
+            </div>
+            <div>
+              <div class="card"><div class="card-title">Room Seat Status</div><div id="dash-bed-summary"></div></div>
+              <div class="card"><div class="card-title">📚 Low Inventory Alerts</div><div id="dash-lib-alerts"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TRIAGE -->
+        <div id="intake-view" class="view">
+          <div class="g2" style="margin-bottom:16px;">
+            <div class="card">
+              <div class="card-title">New Intake Entry</div>
+              <label class="lbl">Student Name</label><input type="text" id="trName" placeholder="Full name">
+              <label class="lbl">Primary Issue</label><input type="text" id="trComplaint" placeholder="e.g., exam anxiety">
+              <label class="lbl">Priority Level</label>
+              <div class="intake-levels">
+                <button class="intake-btn t1" onclick="App.setIntake(1)" id="tl1">P1<br><span style="font-size:.55rem;font-weight:400;">Critical</span></button>
+                <button class="intake-btn t2" onclick="App.setIntake(2)" id="tl2">P2<br><span style="font-size:.55rem;font-weight:400;">Urgent</span></button>
+                <button class="intake-btn t3" onclick="App.setIntake(3)" id="tl3">P3<br><span style="font-size:.55rem;font-weight:400;">High</span></button>
+                <button class="intake-btn t4" onclick="App.setIntake(4)" id="tl4">P4<br><span style="font-size:.55rem;font-weight:400;">Medium</span></button>
+                <button class="intake-btn t5" onclick="App.setIntake(5)" id="tl5">P5<br><span style="font-size:.55rem;font-weight:400;">Routine</span></button>
+              </div>
+              <label class="lbl">Vitals (BP / Pulse / Temp / Participation)</label>
+              <div class="g4">
+                <input type="text" id="trBP" placeholder="120/80"><input type="text" id="trPR" placeholder="3.5">
+                <input type="text" id="trTemp" placeholder="37°C"><input type="text" id="trSPO2" placeholder="98%">
+              </div>
+              <label class="lbl">Attending Counsellor</label><input type="text" id="trCounsellor" placeholder="Name">
+              <button class="btn btn-p btn-full" onclick="App.saveIntake()">Add to Queue</button>
+            </div>
+            <div class="card"><div class="card-title">Queue <span id="intakeQueueCount"></span></div><div id="intakeQueue"></div></div>
+          </div>
+        </div>
+
+        <!-- REGISTRATION -->
+        <div id="reg-view" class="view">
+          <div class="mode-tog">
+            <button id="btnNew" class="mode-btn active" onclick="App.setMode('new')">＋ New Student</button>
+            <button id="btnOld" class="mode-btn" onclick="App.setMode('old')">Returning Student</button>
+          </div>
+          <div id="recallBox" class="recall-box">
+            <label class="lbl" style="color:#fbbf24;">Quick Recall — Search by Name or SID</label>
+            <input type="text" id="dbQuery" placeholder="Start typing…" onkeyup="App.dbSearch()">
+            <div id="resultsList"></div>
+          </div>
+          <div class="card">
+            <div class="card-title">👤 Student Credentials <span>MASTER RECORD</span></div>
+            <div class="g2">
+              <div>
+                <label class="lbl">Full Name</label><input type="text" id="pName" placeholder="John Doe">
+                <label class="lbl">Student ID / National ID</label><input type="text" id="pID" placeholder="12345678">
+                <label class="lbl">Date of Birth</label><input type="text" id="pDOB" placeholder="01/01/1990">
+                <label class="lbl">Gender</label>
+                <select id="pGender"><option value="">—</option><option>Male</option><option>Female</option><option>Other</option></select>
+                <label class="lbl">Year / Grade</label>
+                <select id="pBlood"><option value="">—</option><option>Grade 1</option><option>Grade 2</option><option>Grade 3</option><option>Grade 4</option><option>Grade 5</option><option>Grade 6</option><option>Grade 7</option><option>Grade 8</option><option>Form 1</option><option>Form 2</option><option>Form 3</option><option>Form 4</option></select>
+                <label class="lbl">Address</label><input type="text" id="pAddr" placeholder="123 School Rd.">
+              </div>
+              <div>
+                <label class="lbl">Phone</label><input type="text" id="pPhone" placeholder="+254 700 000 000">
+                <label class="lbl">Parent / Guardian</label><input type="text" id="pKin" placeholder="Jane Doe">
+                <label class="lbl">Guardian Phone</label><input type="text" id="pKinPhone" placeholder="+254 700 000 001">
+                <label class="lbl">Relationship to Student</label><input type="text" id="pKinRel" placeholder="e.g., Mother">
+                <label class="lbl">Sponsor / Bursary</label><input type="text" id="pIns" placeholder="CDF / Scholarship">
+                <label class="lbl">Reference Number</label><input type="text" id="pPol" placeholder="REF-5566">
+                <label class="lbl">Parent Occupation</label><input type="text" id="pOcc" placeholder="e.g., Farmer">
+              </div>
+            </div>
+            <button id="mainBtn" class="btn btn-p btn-full" onclick="App.savePatient().catch(e=>alert(e.message))">Save Student</button>
+          </div>
+        </div>
+
+        <!-- APPOINTMENTS -->
+        <div id="appt-view" class="view">
+          <div class="g2">
+            <div class="card">
+              <div class="card-title">Book Session</div>
+              <label class="lbl">Student</label><input type="text" id="apptPatient" placeholder="Search student…" onkeyup="App.apptSearch()"><div id="apptSearchRes"></div>
+              <label class="lbl">Teacher</label><input type="text" id="apptTeacher" placeholder="Teacher Name">
+              <label class="lbl">Department</label>
+              <select id="apptDept"><option>General Counselling</option><option>Primary School</option><option>Special Education</option><option>Senior School</option><option>STEM Department</option><option>Arts Department</option><option>Sports Department</option><option>Wellbeing Centre</option></select>
+              <div class="g2"><div><label class="lbl">Date</label><input type="date" id="apptDate"></div><div><label class="lbl">Time</label><input type="time" id="apptTime"></div></div>
+              <label class="lbl">Visit Type</label>
+              <select id="apptType"><option>Follow-up Meeting</option><option>New Intake</option><option>Review Progress</option><option>Intervention Session</option><option>Orientation</option><option>Career Counselling</option></select>
+              <label class="lbl">Notes</label><textarea id="apptNotes" rows="2" placeholder="Any notes…"></textarea>
+              <button class="btn btn-p btn-full" onclick="App.saveAppt().catch(e=>alert(e.message))">Book</button>
+            </div>
+            <div class="card"><div class="card-title">Sessions <span id="apptCount"></span></div><div id="apptList"></div></div>
+          </div>
+        </div>
+
+        <!-- STUDENT RECORDS -->
+        <div id="db-view" class="view">
+          <div class="g4" id="statsRow" style="margin-bottom:16px;"></div>
+          <div class="card">
+            <div class="card-title">Student Records <span id="dbCount"></span></div>
+            <input type="text" id="dbSearch" placeholder="🔍 Search by name, SID, ID…" onkeyup="App.renderDB()" style="max-width:340px;margin-bottom:10px;">
+            <table class="tbl">
+              <thead><tr><th>SID</th><th>Name</th><th>Gender</th><th>Grade</th><th>Last Visit</th><th>Disposition</th><th>Bed</th><th>Balance</th><th>Actions</th></tr></thead>
+              <tbody id="dbContent"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- CLINICAL CHART -->
+        <div id="chart-view" class="view">
+          <div class="card">
+            <div class="chart-hdr">
+              <div>
+                <div class="pt-name" id="activePatientName">No Student Selected</div>
+                <span class="pid-badge" id="activePIDBadge">SID: 0000</span>
+                <span class="bdg bb" id="activeBloodBadge" style="margin-left:6px;display:none;"></span>
+              </div>
+              <button class="btn btn-s" id="chart-save-btn" onclick="App.saveAcademic().catch(e=>alert(e.message))">Save Visit</button>
+            </div>
+            <div id="discharged-banner" style="display:none;align-items:center;gap:12px;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);border-radius:8px;padding:10px 16px;margin-bottom:12px;">
+              <span style="font-size:1.3rem;">🏥</span>
+              <div><div style="font-weight:700;font-size:.85rem;color:#f87171;">Student Transferred</div><div style="font-size:.75rem;color:var(--muted);">This student has been transferred. Room assignment and future scheduling are not applicable.</div></div>
+            </div>
+            <hr class="hr">
+            <div class="g2">
+              <div>
+                <div class="card-title" style="margin-bottom:0;">Academic History</div>
+                <label class="lbl">Primary Issue</label><input type="text" id="cComplaint" placeholder="e.g., poor attendance">
+                <label class="lbl">Issue Details</label><textarea id="cIssue Details" rows="3" placeholder="Onset, duration, severity…"></textarea>
+                <label class="lbl">Past Academic History</label><textarea id="cPastHistory" rows="2" placeholder="Previous schools, incidents…"></textarea>
+                <label class="lbl">Special Needs &amp; Support Plans</label><textarea id="cResourceHistory" rows="2" placeholder="IEPs, accommodations…"></textarea>
+                <label class="lbl">Family Background</label><input type="text" id="cFamilyHistory" placeholder="e.g., learning disabilities in family">
+                <label class="lbl">Social Background</label><input type="text" id="cSocialHistory" placeholder="e.g., home environment, work">
+                <label class="lbl">Behavioural Review</label><textarea id="cReview" rows="2" placeholder="Behavioural observations…"></textarea>
+              </div>
+              <div>
+                <div class="card-title" style="margin-bottom:0;">Assessment &amp; Action Plan</div>
+                <label class="lbl">Assessment Findings</label><textarea id="cExam" rows="3" placeholder="Academic/behavioural findings…"></textarea>
+                <label class="lbl">Outcome / Decision</label><input type="text" id="cOutcome / Decision" placeholder="e.g., Learning Difficulty, Behavioural Issue">
+                <label class="lbl">Category Code</label><input type="text" id="cICD" placeholder="e.g., LD-01">
+                <label class="lbl">Support / Action Plan</label><textarea id="cNote" rows="3" placeholder="Support plan, assessments…"></textarea>
+                <div class="panel"><div class="panel-title">Recommendations</div><div id="rxList"></div>
+                  <div class="g3" style="margin-top:8px;">
+                    <div><label class="lbl">Resource</label><input type="text" id="rxResource" placeholder="Resource / Intervention"></div>
+                    <div><label class="lbl">Dose / Freq</label><input type="text" id="rxDose" placeholder="Weekly sessions"></div>
+                    <div><label class="lbl">Duration</label><input type="text" id="rxDur" placeholder="7 days"></div>
+                  </div>
+                  <button class="btn btn-g" style="margin-top:8px;font-size:.75rem;" onclick="App.addRx()">Add Recommendation</button>
+                </div>
+                <div class="panel" id="chart-next-panel"><div class="panel-title">Next Visit</div>
+                  <div class="g2"><div><label class="lbl">Date</label><input type="date" id="cNextDate"></div><div><label class="lbl">Purpose</label><input type="text" id="cNextPurpose"></div></div>
+                </div>
+                <div class="panel" id="chart-room-panel" style="border-left:3px solid var(--purple);"><div class="panel-title" style="color:#a78bfa;">Room Assignment</div>
+                  <div class="g2">
+                    <div><label class="lbl">Room</label><select id="cSeatRoom" onchange="App.populateBedSelect()"><option value="">— None —</option></select></div>
+                    <div><label class="lbl">Seat</label><select id="cSeatNum"><option value="">— Select Room —</option></select></div>
+                  </div>
+                </div>
+                <div class="panel"><div class="panel-title">Disposition</div>
+                  <div class="disp-g">
+                    <div class="disp-card" id="disp-return"    onclick="App.setDisp('return')">    <span class="disp-icon"></span><div class="disp-lbl">Return Visit</div></div>
+                    <div class="disp-card" id="disp-referral"  onclick="App.setDisp('referral')">  <span class="disp-icon"></span><div class="disp-lbl">Referred</div></div>
+                    <div class="disp-card" id="disp-transfer" onclick="App.setDisp('transfer')"> <span class="disp-icon"></span><div class="disp-lbl">Transferred</div></div>
+                  </div>
+                  <div class="disp-det" id="dd-return"><div class="panel" style="border-left:3px solid var(--green);"><div class="g2"><div><label class="lbl">Return Date</label><input type="date" id="cDispRD"></div><div><label class="lbl">Reason</label><input type="text" id="cDispRR"></div></div></div></div>
+                  <div class="disp-det" id="dd-referral"><div class="panel" style="border-left:3px solid var(--yellow);"><label class="lbl">School / Institution</label><input type="text" id="cDispRH"><div class="g2"><div><label class="lbl">Department</label><input type="text" id="cDispRDept"></div><div><label class="lbl">Date</label><input type="date" id="cDispRDate"></div></div><label class="lbl">Reason</label><textarea id="cDispReason" rows="2"></textarea></div></div>
+                  <div class="disp-det" id="dd-transfer"><div class="panel" style="border-left:3px solid var(--red);"><label class="lbl">Transfer Summary</label><textarea id="cTransferNote" rows="2"></textarea><div class="g2"><div><label class="lbl">Date</label><input type="date" id="cTransferDate"></div><div><label class="lbl">Condition</label><select id="cTransferCondition"><option value="">—</option><option>Pass / Promoted</option><option>Conditional Pass</option><option>Stable</option><option>Withdrew</option><option>Expelled</option></select></div></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- VITALS -->
+        <div id="metrics-view" class="view">
+          <div class="g2">
+            <div class="card">
+              <div class="card-title">Record Academic Metrics</div>
+              <label class="lbl">Student</label><input type="text" id="vPatient" placeholder="Search student…" onkeyup="App.vSearch()"><div id="vSearchRes"></div>
+              <div style="font-size:.72rem;color:var(--accent);margin-top:4px;" id="vActivePatient"></div>
+              <div class="g3" style="margin-top:6px;">
+                <div><label class="lbl">Attendance Rate</label><input type="text" id="vAR" placeholder="95%"></div>
+                <div><label class="lbl">GPA / Grade Avg</label><input type="text" id="vPR" placeholder="3.5"></div>
+                <div><label class="lbl">Behaviour Score</label><input type="text" id="vTemp" placeholder="8/10"></div>
+                <div><label class="lbl">Participation</label><input type="text" id="vPart" placeholder="98%"></div>
+                <div><label class="lbl">Homework Rate</label><input type="text" id="vRR" placeholder="90%"></div>
+                <div><label class="lbl">Term Credits</label><input type="text" id="vWeight" placeholder="70"></div>
+                <div><label class="lbl">Total Credits</label><input type="text" id="vHeight" placeholder="170"></div>
+                <div><label class="lbl">Credit Ratio</label><input type="text" id="vCreditRatio" placeholder="—" readonly></div>
+                <div><label class="lbl">Test Score Avg</label><input type="text" id="vTestAvg" placeholder="72%"></div>
+              </div>
+              <label class="lbl">Notes</label><textarea id="vNotes" rows="2"></textarea>
+              <button class="btn btn-p btn-full" onclick="App.saveMetrics().catch(e=>alert(e.message))">Save Metrics</button>
+            </div>
+            <div class="card"><div class="card-title">Metrics Log</div>
+              <table class="tbl"><thead><tr><th>Time</th><th>Student</th><th>Attend.</th><th>GPA</th><th>Behav.</th><th>Participation</th><th>Credits</th></tr></thead><tbody id="metricsLog"></tbody></table>
+            </div>
+          </div>
+        </div>
+
+        <!-- EXAMINATIONS -->
+        <div id="exam-view" class="view">
+          <div class="g2">
+            <div class="card">
+              <div class="card-title">Request Examination / Assessment</div>
+              <label class="lbl">Student</label><input type="text" id="examStudent" placeholder="Search student…" onkeyup="App.examSearch()"><div id="examSearchRes"></div>
+              <div style="font-size:.72rem;color:var(--accent);" id="examActiveStudent"></div>
+              <label class="lbl">Assessment Type</label>
+              <select id="examCat"><option value="">— Select —</option><option>Written Exam</option><option>Oral Assessment</option><option>Practical Exam</option><option>Aptitude Test</option><option>Psychological Assessment</option><option>Portfolio Review</option><option>Test Score Avg</option><option>Skills Assessment</option><option>Diagnostic Test</option><option>Observational Report</option><option>Mock Examination</option><option>Standardised Test</option><option>Peer Review</option><option>Self Assessment</option><option>Other</option></select>
+              <label class="lbl">Notes</label><input type="text" id="examNote" placeholder="Specific assessment details">
+              <label class="lbl">Priority</label><select id="examPriority"><option>Routine</option><option>Urgent</option><option>STAT</option></select>
+              <label class="lbl">Requesting Teacher</label><input type="text" id="examTeacher" placeholder="Teacher Name">
+              <button class="btn btn-p btn-full" onclick="App.saveExam()">Submit Request</button>
+            </div>
+            <div class="card"><div class="card-title">Assessment Requests <span id="examCount"></span></div>
+              <table class="tbl"><thead><tr><th>Time</th><th>Student</th><th>Test</th><th>Priority</th><th>Status</th><th>Action</th></tr></thead><tbody id="examList"></tbody></table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ROOMS & SEATS -->
+        <div id="rooms-view" class="view">
+          <div class="g5" id="roomSummary" style="margin-bottom:16px;"></div>
+          <div class="card" style="padding:14px 18px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+              <div class="room-tabs" id="roomTabs"></div>
+              <div style="display:flex;gap:7px;"><button class="btn btn-p" onclick="RoomMgr.openAddRoom()">+ Room</button><button class="btn btn-g" onclick="RoomMgr.openAddSeats()">+ Seats</button></div>
+            </div>
+          </div>
+          <div class="legend">
+            <div class="leg-item"><div class="leg-dot" style="background:var(--green)"></div>Free</div>
+            <div class="leg-item"><div class="leg-dot" style="background:var(--red)"></div>In Use</div>
+            <div class="leg-item"><div class="leg-dot" style="background:var(--yellow)"></div>Booked</div>
+            <div class="leg-item"><div class="leg-dot" style="background:#475569"></div>Unavailable</div>
+          </div>
+          <div class="card"><div class="card-title" id="roomGridTitle">Seats</div><div class="seat-grid" id="seatGrid"></div><div id="seatGridEmpty" style="display:none;color:var(--muted);font-size:.82rem;padding:16px 0;">No beds yet. Click "+ Seats".</div></div>
+        </div>
+
+        <!-- LIBRARY -->
+        <div id="library-view" class="view">
+          <div class="g2">
+            <div class="card">
+              <div class="card-title">Resource Inventory</div>
+              <label class="lbl">Resource Name</label><input type="text" id="resourceName" placeholder="e.g., Mathematics Textbook Gr.10">
+              <label class="lbl">Category</label><select id="resourceCat"><option>Textbook</option><option>Exercise Book</option><option>Novel / Literature</option><option>Reference Book</option><option>Science Kit</option><option>Stationery</option><option>Art Supply</option><option>Sports Equipment</option><option>Digital Resource</option><option>Other</option></select>
+              <div class="g2"><div><label class="lbl">Quantity</label><input type="number" id="resourceQty" placeholder="0" min="0"></div><div><label class="lbl">Unit</label><select id="resourceUnit"><option>Copies</option><option>Sets</option><option>Boxes</option><option>Packs</option><option>Folders</option><option>Units</option></select></div></div>
+              <div class="g2"><div><label class="lbl">Restock Level</label><input type="number" id="resourceReorder" placeholder="10"></div><div><label class="lbl">Unit Cost</label><input type="number" id="resourcePrice" placeholder="0.00" step="0.01"></div></div>
+              <label class="lbl">Review Date</label><input type="date" id="resourceExpiry">
+              <label class="lbl">Supplier / Publisher</label><input type="text" id="resourceSupplier / Publisher" placeholder="Supplier / Publisher name">
+              <button class="btn btn-p btn-full" onclick="LibMgr.saveResource().catch(e=>alert(e.message))">Save to Inventory</button>
+            </div>
+            <div class="card">
+              <div class="card-title">Inventory List <span id="libCount"></span></div>
+              <input type="text" id="libSearch" placeholder="🔍 Search resources…" onkeyup="LibMgr.render()" style="margin-bottom:10px;">
+              <table class="tbl"><thead><tr><th>Resource</th><th>Cat</th><th>Stock</th><th>Price</th><th>Expiry</th><th></th></tr></thead><tbody id="libList"></tbody></table>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-title">Dispense</div>
+            <div class="g3"><div><label class="lbl">Student SID</label><input type="text" id="issueStudent" placeholder="SID-XXXXX"></div><div><label class="lbl">Resource</label><select id="dispResource"><option value="">— Select —</option></select></div><div><label class="lbl">Qty</label><input type="number" id="issueQty" value="1" min="1"></div></div>
+            <div class="g2"><div><label class="lbl">Instructions</label><input type="text" id="issueInstr" placeholder="Return by end of term"></div><div style="display:flex;align-items:flex-end;"><button class="btn btn-s btn-full" style="margin-top:0;" onclick="LibMgr.dispense().catch(e=>alert(e.message))">Issue Item</button></div></div>
+          </div>
+        </div>
+
+        <!-- BILLING -->
+        <div id="billing-view" class="view">
+          <div class="g2">
+            <div class="card">
+              <div class="card-title">Create Invoice</div>
+              <label class="lbl">Student</label><input type="text" id="billPatient" placeholder="Search student…" onkeyup="App.billSearch()"><div id="billSearchRes"></div>
+              <div style="font-size:.72rem;color:var(--accent);margin-top:4px;" id="billActivePatient"></div>
+              <div id="billItems" style="margin-top:12px;"></div>
+              <div class="g3" style="margin-top:8px;"><div><label class="lbl">Description</label><input type="text" id="billDesc" placeholder="e.g., Tuition fee"></div><div><label class="lbl">Qty</label><input type="number" id="billQtyI" value="1" min="1"></div><div><label class="lbl">Unit Cost</label><input type="number" id="billUnit" placeholder="0.00" step="0.01"></div></div>
+              <button class="btn btn-g" style="margin-top:8px;font-size:.75rem;" onclick="Billing.addItem()">＋ Add Line</button>
+              <div class="bill-total-box"><span style="font-weight:700;">Total</span><span style="font-family:'Syne',sans-serif;font-size:1.2rem;font-weight:800;color:var(--accent);">KES <span id="billTotal">0.00</span></span></div>
+              <div class="g2"><div><label class="lbl">Payment Method</label><select id="billMethod"><option>Cash</option><option>School Bursary / Sponsor</option><option>M-Pesa</option><option>Bank Transfer</option><option>Fee Balance (Pending)</option></select></div><div><label class="lbl">Amount Paid</label><input type="number" id="billPaid" placeholder="0.00" step="0.01" oninput="Billing.calcBalance()"></div></div>
+              <div class="bill-total-box" style="margin-top:8px;background:rgba(239,68,68,.06);border-color:rgba(239,68,68,.2);"><span style="font-weight:700;">Balance Due</span><span style="font-family:'Syne',sans-serif;font-size:1rem;font-weight:800;color:var(--red);">KES <span id="billBalance">0.00</span></span></div>
+              <button class="btn btn-s btn-full" onclick="Billing.saveInvoice().catch(e=>alert(e.message))">🧾 Issue Fee Statement</button>
+            </div>
+            <div class="card"><div class="card-title">🧾 Fee Statement History <span id="invoiceCount"></span></div>
+              <table class="tbl"><thead><tr><th>Invoice</th><th>Student</th><th>Total</th><th>Paid</th><th>Balance</th><th>Method</th><th>Date</th></tr></thead><tbody id="invoiceList"></tbody></table>
+            </div>
+          </div>
+        </div>
+
+        <div id="admin-view" class="view">
+
+          <!-- ADMIN TAB NAV -->
+          <div style="display:flex;gap:6px;margin-bottom:20px;border-bottom:1px solid var(--border);padding-bottom:0;">
+            <button class="adm-tab active" id="atab-overview" onclick="adminTab('overview')">Overview</button>
+            <button class="adm-tab" id="atab-users" onclick="adminTab('users')">User Management</button>
+            <button class="adm-tab" id="atab-create" onclick="adminTab('create')">Create Account</button>
+            <button class="adm-tab" id="atab-logs" onclick="adminTab('logs')">Audit Log</button>
+          </div>
+
+          <!-- ── OVERVIEW TAB ── -->
+          <div id="apanel-overview" class="apanel active">
+            <div class="g4" style="margin-bottom:20px;">
+              <div class="stat"><div class="stat-val ca" id="adminStatUsers">0</div><div class="stat-lbl">Total Users</div></div>
+              <div class="stat"><div class="stat-val cg" id="adminStatActive">0</div><div class="stat-lbl">Active Accounts</div></div>
+              <div class="stat"><div class="stat-val cr" id="adminStatDisabled">0</div><div class="stat-lbl">Disabled Accounts</div></div>
+              <div class="stat"><div class="stat-val cp" id="adminStatAdmins">0</div><div class="stat-lbl">Administrators</div></div>
+            </div>
+            <div class="g2">
+              <div class="card">
+                <div class="card-title">Role Breakdown</div>
+                <div id="adminRoleBreakdown"></div>
+              </div>
+              <div class="card">
+                <div class="card-title">Recent Activity</div>
+                <div id="adminRecentActivity"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ── USER MANAGEMENT TAB ── -->
+          <div id="apanel-users" class="apanel" style="display:none;">
+            <div class="card">
+              <div class="card-title">System Users <span id="allUsersCount"></span>
+                <input type="text" id="adminUserSearch" placeholder="Search users…" onkeyup="filterAdminUsers()" style="width:200px;padding:5px 10px;font-size:.78rem;">
+              </div>
+              <div id="allUsersList"></div>
+            </div>
+          </div>
+
+          <!-- ── CREATE ACCOUNT TAB ── -->
+          <div id="apanel-create" class="apanel" style="display:none;">
+            <div class="card" style="max-width:480px;">
+              <div class="card-title">New Staff Account</div>
+              <div id="createAccErr" class="auth-err"></div>
+              <div id="createAccSuccess" class="auth-success"></div>
+              <label class="lbl">Full Name</label>
+              <input type="text" id="newAdminName" placeholder="e.g. Jane Doe" onkeydown="if(event.key==='Enter')Auth.createAdmin()">
+              <label class="lbl">Username</label>
+              <input type="text" id="newAdminEmail" placeholder="e.g. janedoe" autocomplete="off" onkeydown="if(event.key==='Enter')Auth.createAdmin()">
+              <label class="lbl">Password</label>
+              <input type="password" id="newAdminPass" placeholder="Set a password" onkeydown="if(event.key==='Enter')Auth.createAdmin()">
+              <label class="lbl">Role</label>
+              <select id="newAccRoleSelect" style="margin-bottom:4px;">
+                <option value="doctor">Teacher / Instructor</option>
+                <option value="nurse">Counsellor / Student Officer</option>
+                <option value="librarian">Librarian</option>
+                <option value="lab">Exam Coordinator</option>
+                <option value="admin">Administrator</option>
+              </select>
+              <button class="btn btn-p btn-full" onclick="Auth.createAdmin()">Create Account →</button>
+            </div>
+          </div>
+
+          <!-- ── AUDIT LOG TAB ── -->
+          <div id="apanel-logs" class="apanel" style="display:none;">
+            <div class="card">
+              <div class="card-title">Audit Log
+                <button class="btn btn-g" style="font-size:.72rem;padding:4px 10px;" onclick="App.renderLedger();adminTab('logs')">Refresh</button>
+              </div>
+              <table class="tbl">
+                <thead><tr><th>Time</th><th>User</th><th>Action</th><th>Target</th><th>Details</th></tr></thead>
+                <tbody id="adminLedgerContent"></tbody>
+              </table>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- STAFF -->
+        <div id="staff-view" class="view">
+          <div class="g2">
+            <div class="card">
+              <div class="card-title">🎓 Add Staff</div>
+              <div class="g2">
+                <div><label class="lbl">Full Name</label><input type="text" id="sfName" placeholder="Ms. Jane Doe"></div>
+                <div><label class="lbl">Staff ID</label><input type="text" id="sfID" placeholder="STF-001"></div>
+              </div>
+              <div class="g2">
+                <div><label class="lbl">Role</label><select id="sfRole"><option>Teacher</option><option>Counsellor</option><option>Academic Officer</option><option>Exam Coordinator</option><option>Librarian</option><option>Librarian</option><option>Secretary</option><option>Administrator</option></select></div>
+                <div><label class="lbl">Department</label><select id="sfDept"><option>Administration</option><option>Examinations</option><option>Special Education</option><option>Primary School</option><option>Senior School</option><option>Special Needs</option><option>Examination Room</option><option>Library</option></select></div>
+              </div>
+              <div class="g2">
+                <div><label class="lbl">Phone</label><input type="text" id="sfPhone" placeholder="+254..."></div>
+                <div><label class="lbl">Status</label><select id="sfStatus"><option>In Class</option><option>Off Campus</option><option>On Leave</option><option>Night Duty</option></select></div>
+              </div>
+              <label class="lbl">Qualification / Specialisation</label><input type="text" id="sfSpec" placeholder="e.g., B.Ed, PGDE, MA">
+              <button class="btn btn-p btn-full" onclick="App.saveStaff().catch(e=>alert(e.message))">➕ Add Staff</button>
+            </div>
+            <div class="card"><div class="card-title">👥 Staff Directory <span id="staffCount"></span></div><div id="staffGrid" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;"></div></div>
+          </div>
+        </div>
+
+        <!-- AUDIT LEDGER -->
+        <div id="ledger-view" class="view">
+          <div class="card">
+            <div class="card-title">🛡️ Audit Ledger <span>FORENSIC TRAIL</span></div>
+            <table class="tbl"><thead><tr><th>Timestamp</th><th>User</th><th>Action</th><th>Target</th><th>Details</th></tr></thead>
+            <tbody id="ledgerContent" style="font-family:'Courier New',monospace;font-size:.72rem;"></tbody></table>
+          </div>
+        </div>
+
+      </div><!-- /view-wrap -->
+    </main>
+  </div><!-- /app-body -->
+</div><!-- /appWrap -->
+
+<!-- MODALS -->
+<div class="modal-ov" id="seatModal"><div class="modal"><div class="modal-title"><span id="seatModalTitle">Seat</span><button class="modal-close" onclick="closeModal('seatModal')">✕</button></div><div id="seatModalBody"></div><div class="modal-actions" id="seatModalActions"></div></div></div>
+<div class="modal-ov" id="addRoomModal"><div class="modal"><div class="modal-title">＋ New Room <button class="modal-close" onclick="closeModal('addRoomModal')">✕</button></div><label class="lbl">Room Name</label><input type="text" id="newRoomName" placeholder="e.g., Library Room"><div class="modal-actions"><button class="btn btn-g" onclick="closeModal('addRoomModal')">Cancel</button><button class="btn btn-p" onclick="RoomMgr.addRoom()">Create</button></div></div></div>
+<div class="modal-ov" id="addSeatModal"><div class="modal"><div class="modal-title">＋ Add Seats <button class="modal-close" onclick="closeModal('addSeatModal')">✕</button></div><label class="lbl">Room</label><select id="addSeatWardSel"></select><label class="lbl">Number of Seats</label><input type="number" id="addSeatCount" value="5" min="1" max="100"><div class="modal-actions"><button class="btn btn-g" onclick="closeModal('addSeatModal')">Cancel</button><button class="btn btn-p" onclick="RoomMgr.addSeats()">Add</button></div></div></div>
+<div class="modal-ov" id="examResultModal"><div class="modal"><div class="modal-title"><span id="examResTitle">📝 Enter Result</span><button class="modal-close" onclick="closeModal('examResultModal')">✕</button></div><input type="hidden" id="examResIdx"><label class="lbl">Result</label><textarea id="examResText" rows="4" placeholder="Enter result…"></textarea><label class="lbl">Status</label><select id="examResStatus"><option>Completed</option><option>Pending</option></select><div class="modal-actions"><button class="btn btn-g" onclick="closeModal('examResultModal')">Cancel</button><button class="btn btn-s" onclick="App.saveExamResult()">Save</button></div></div></div>
+
+<!-- Link to external JavaScript file -->
+<script src="assets/app.js"></script>
+</body>
+</html>
