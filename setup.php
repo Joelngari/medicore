@@ -1,11 +1,4 @@
 <?php
-// ============================================================
-//  setup.php — Auto database setup
-//  Visit this URL once after deploying to create all tables:
-//  https://your-app.onrender.com/setup.php
-//  DELETE or RENAME this file after running it once.
-// ============================================================
-
 require_once 'db.php';
 
 $tables = [
@@ -22,7 +15,7 @@ $tables = [
     status      VARCHAR(20)  DEFAULT 'approved',
     sec_q       TEXT,
     sec_a       VARCHAR(255),
-    created_at  DATETIME     DEFAULT CURRENT_TIMESTAMP
+    created_at  DATETIME     DEFAULT '2000-01-01 00:00:00'
 )",
 
 "CREATE TABLE IF NOT EXISTS edu_students (
@@ -59,9 +52,9 @@ $tables = [
     room_name        VARCHAR(100),
     balance          DECIMAL(12,2) DEFAULT 0,
     last_visit       VARCHAR(30),
-    rx_list          JSON,
-    disp_data        JSON,
-    created_at       DATETIME DEFAULT CURRENT_TIMESTAMP
+    rx_list          MEDIUMTEXT,
+    disp_data        MEDIUMTEXT,
+    created_at       DATETIME DEFAULT '2000-01-01 00:00:00'
 )",
 
 "CREATE TABLE IF NOT EXISTS edu_intake (
@@ -75,7 +68,7 @@ $tables = [
     spo2        VARCHAR(30),
     counsellor  VARCHAR(150),
     status      VARCHAR(30) DEFAULT 'Waiting',
-    created_at  DATETIME    DEFAULT CURRENT_TIMESTAMP
+    created_at  DATETIME    DEFAULT '2000-01-01 00:00:00'
 )",
 
 "CREATE TABLE IF NOT EXISTS edu_sessions (
@@ -89,7 +82,7 @@ $tables = [
     type        VARCHAR(80),
     notes       TEXT,
     status      VARCHAR(30) DEFAULT 'Scheduled',
-    created_at  DATETIME    DEFAULT CURRENT_TIMESTAMP
+    created_at  DATETIME    DEFAULT '2000-01-01 00:00:00'
 )",
 
 "CREATE TABLE IF NOT EXISTS edu_metrics (
@@ -106,7 +99,7 @@ $tables = [
     credit_ratio  VARCHAR(30),
     test_avg      VARCHAR(30),
     notes         TEXT,
-    created_at    DATETIME DEFAULT CURRENT_TIMESTAMP
+    created_at    DATETIME DEFAULT '2000-01-01 00:00:00'
 )",
 
 "CREATE TABLE IF NOT EXISTS edu_exams (
@@ -119,14 +112,14 @@ $tables = [
     teacher      VARCHAR(150),
     status       VARCHAR(30) DEFAULT 'Pending',
     result       TEXT,
-    created_at   DATETIME DEFAULT CURRENT_TIMESTAMP
+    created_at   DATETIME DEFAULT '2000-01-01 00:00:00'
 )",
 
 "CREATE TABLE IF NOT EXISTS edu_rooms (
     id         VARCHAR(50)  PRIMARY KEY,
     name       VARCHAR(100) NOT NULL,
-    seats      JSON,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    seats      MEDIUMTEXT,
+    created_at DATETIME DEFAULT '2000-01-01 00:00:00'
 )",
 
 "CREATE TABLE IF NOT EXISTS edu_inventory (
@@ -139,19 +132,19 @@ $tables = [
     price      DECIMAL(10,2) DEFAULT 0,
     expiry     VARCHAR(30),
     supplier   VARCHAR(150),
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    created_at DATETIME DEFAULT '2000-01-01 00:00:00'
 )",
 
 "CREATE TABLE IF NOT EXISTS edu_invoices (
     id         VARCHAR(50)  PRIMARY KEY,
     student_id VARCHAR(50),
-    items      JSON,
+    items      MEDIUMTEXT,
     total      DECIMAL(12,2),
     paid       DECIMAL(12,2),
     balance    DECIMAL(12,2),
     method     VARCHAR(80),
     date       VARCHAR(30),
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    created_at DATETIME DEFAULT '2000-01-01 00:00:00'
 )",
 
 "CREATE TABLE IF NOT EXISTS edu_staff (
@@ -164,7 +157,7 @@ $tables = [
     status     VARCHAR(50),
     spec       VARCHAR(150),
     joined     VARCHAR(30),
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    created_at DATETIME DEFAULT '2000-01-01 00:00:00'
 )",
 
 "CREATE TABLE IF NOT EXISTS edu_logs (
@@ -175,7 +168,7 @@ $tables = [
     target     VARCHAR(100),
     details    TEXT,
     cls        VARCHAR(20),
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    created_at DATETIME DEFAULT '2000-01-01 00:00:00'
 )",
 
 ];
@@ -184,7 +177,6 @@ $results = [];
 $allOk   = true;
 
 foreach ($tables as $sql) {
-    // Extract table name for the report
     preg_match('/CREATE TABLE IF NOT EXISTS (\w+)/i', $sql, $m);
     $tableName = $m[1] ?? 'unknown';
     try {
@@ -199,23 +191,22 @@ foreach ($tables as $sql) {
 // Seed default admin
 try {
     $pdo->exec("INSERT IGNORE INTO edu_users
-        (id,name,username,email,password,role,dept,staff_id,status)
+        (id,name,username,email,password,role,dept,staff_id,status,created_at)
         VALUES (
             'USR-ADMIN','System Administrator','admin',
             'admin@educore.local','Admin@1234',
-            'admin','Administration','ADMIN-001','approved'
+            'admin','Administration','ADMIN-001','approved','2000-01-01 00:00:00'
         )");
     $results[] = ['table' => 'Default admin', 'status' => '✅ Seeded (admin / Admin@1234)'];
 } catch (PDOException $e) {
     $results[] = ['table' => 'Default admin', 'status' => '⚠️ ' . $e->getMessage()];
 }
-
 ?>
 <!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
-<title>EduCore — Database Setup</title>
+<title>EduCore Setup</title>
 <style>
   body{font-family:sans-serif;background:#f0f9ff;padding:40px;color:#0f172a;}
   h1{color:#0284c7;}
@@ -230,25 +221,20 @@ try {
 </head>
 <body>
 <h1>⚡ EduCore Database Setup</h1>
-<p>Setting up all database tables...</p>
-
 <table>
   <tr><th>Table</th><th>Status</th></tr>
   <?php foreach($results as $r): ?>
   <tr><td><?= htmlspecialchars($r['table']) ?></td><td><?= htmlspecialchars($r['status']) ?></td></tr>
   <?php endforeach; ?>
 </table>
-
 <?php if($allOk): ?>
 <div class="done">
-  ✅ All tables created successfully!<br><br>
-  <strong>Login:</strong> admin / Admin@1234<br><br>
-  ⚠️ <strong>Important:</strong> Delete or rename setup.php now for security.
+  ✅ All tables created!<br><br>
+  Login: <strong>admin / Admin@1234</strong>
 </div>
-<a class="btn" href="index.html">Go to EduCore →</a>
+<a class="btn" href="index.html">Open EduCore →</a>
 <?php else: ?>
-<div class="err">❌ Some tables failed. Check the errors above.</div>
+<div class="err">❌ Some tables failed. Check errors above.</div>
 <?php endif; ?>
-
 </body>
 </html>
